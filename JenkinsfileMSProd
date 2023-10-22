@@ -1,0 +1,130 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Switch Microservices Prod') {
+            steps {
+                build job: 'change-environment-tag', parameters: [string(name: 'ACQUIATAG', value: params.TAG), string(name: 'ACQUIAAPP', value: 'stewardcommunity'), string(name: 'ACQUIAENV', value: 'prod')]
+            }
+        }
+        stage('Wait five minutes because the switch job tells us that we switched even if it will still take some time') {
+            steps {
+                build job: 'wait-n-seconds', parameters: [string(name: 'SECONDS', value: '300')]
+            }
+            post{
+                failure {
+                    script{
+                        error "Failed, exiting now..."
+                    }
+                }
+                unstable {
+                    script{
+                        error "Unstable, exiting now..."
+                    }
+                }
+            }
+        }
+        stage('Update Prod MS') {
+            steps {
+                build job: 'update-ms-prod-msprod'
+            }
+            post{
+                failure {
+                    script{
+                        error "Failed, exiting now..."
+                    }
+                }
+                unstable {
+                    script{
+                        error "Unstable, exiting now..."
+                    }
+                }
+            }
+        }
+        stage('Update Prod Events') {
+            steps {
+                build job: 'update-events-prod-msprod'
+            }
+            post{
+                failure {
+                    script{
+                        error "Failed, exiting now..."
+                    }
+                }
+                unstable {
+                    script{
+                        error "Unstable, exiting now..."
+                    }
+                }
+            }
+        }
+        stage('Update Prod Feed') {
+            steps {
+                build job: 'update-feed-prod-msprod'
+            }
+            post{
+                failure {
+                    script{
+                        error "Failed, exiting now..."
+                    }
+                }
+                unstable {
+                    script{
+                        error "Unstable, exiting now..."
+                    }
+                }
+            }
+        }
+        stage('Update Prod ER wait') {
+            steps {
+                build job: 'update-erwait-prod-msprod'
+            }
+            post{
+                failure {
+                    script{
+                        error "Failed, exiting now..."
+                    }
+                }
+                unstable {
+                    script{
+                        error "Unstable, exiting now..."
+                    }
+                }
+            }
+        }
+        stage('Update Prod Doctors') {
+            steps {
+                build job: 'update-doctors-prod-msprod'
+            }
+            post{
+                failure {
+                    script{
+                        error "Failed, exiting now..."
+                    }
+                }
+                unstable {
+                    script{
+                        error "Unstable, exiting now..."
+                    }
+                }
+            }
+        }
+        stage('Update Prod Forms') {
+            steps {
+                build job: 'update-forms-prod-msprod'
+            }
+            post{
+                failure {
+                    script{
+                        error "Failed, exiting now..."
+                    }
+                }
+                unstable {
+                    script{
+                        error "Unstable, exiting now..."
+                    }
+                }
+            }
+        }
+    }
+}

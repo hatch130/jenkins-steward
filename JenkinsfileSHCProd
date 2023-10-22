@@ -1,0 +1,74 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Switch SHC Prod') {
+            steps {
+                build job: 'change-environment-tag', parameters: [string(name: 'ACQUIATAG', value: params.TAG), string(name: 'ACQUIAAPP', value: 'stewardd8'), string(name: 'ACQUIAENV', value: 'prod')]
+            }
+            post{
+                failure {
+                    script{
+                        error "Failed, exiting now..."
+                    }
+                }
+                unstable {
+                    script{
+                        error "Unstable, exiting now..."
+                    }
+                }
+            }
+        }
+        stage('Wait five minutes because the switch job tells us that we switched even if it will still take some time') {
+            steps {
+                build job: 'wait-n-seconds', parameters: [string(name: 'SECONDS', value: '300')]
+            }
+            post{
+                failure {
+                    script{
+                        error "Failed, exiting now..."
+                    }
+                }
+                unstable {
+                    script{
+                        error "Unstable, exiting now..."
+                    }
+                }
+            }
+        }
+        stage('Update Prod SHC') {
+            steps {
+                build job: 'steward-shc-update-prod'
+            }
+            post{
+                failure {
+                    script{
+                        error "Failed, exiting now..."
+                    }
+                }
+                unstable {
+                    script{
+                        error "Unstable, exiting now..."
+                    }
+                }
+            }
+        }
+        stage('Update Prod PHYS') {
+            steps {
+                build job: 'steward-phys-update-prod'
+            }
+            post{
+                failure {
+                    script{
+                        error "Failed, exiting now..."
+                    }
+                }
+                unstable {
+                    script{
+                        error "Unstable, exiting now..."
+                    }
+                }
+            }
+        }
+    }
+}
